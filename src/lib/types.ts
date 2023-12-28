@@ -19,3 +19,9 @@ export interface ApiResponseUser {
 	deactivationDate?: boolean;
 	devices: { id: string }[];
 }
+
+export interface RegisterAPIResponse {
+	success: boolean;
+	message: string;
+	key?: 'name' | 'password' | 'email' | 'confirmPassword';
+}

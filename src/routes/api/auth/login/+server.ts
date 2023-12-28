@@ -28,13 +28,16 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 	const sendedVerifyMail = await cache.has(`sended-verify-email/email:${body.email}`);
 	if (!user) {
 		// edge case where the user tries to login and has registered but did not activate his account
-		if (sendedVerifyMail) return json({ message: 'Make sure to activate your account before you login' });
-		return json({ message: 'The email or password is incorrect' });
+		if (sendedVerifyMail) {
+			return json({ success: false, message: 'Make sure to activate your account before you login' });
+		}
+
+		return json({ success: false, message: 'The email or password is incorrect' });
 	}
 
 	// validate credentials
 	if (!(await checkCredentials(body.email, body.password))) {
-		return json({ message: 'The email or password is incorrect' });
+		return json({ success: false, message: 'The email or password is incorrect' });
 	}
 
 	// set token
@@ -42,11 +45,14 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 	cookies.set('token', token, { httpOnly: true, maxAge: ms('3d') / 1000, path: '/' });
 
 	return json({
-		id: user.id,
-		createdAt: user.createdAt,
-		name: user.name,
-		email: user.email,
-		deactivated: user.deactivated,
-		devices: await database.device.findMany({ where: { ownerId: user.id }, select: { id: true } }),
-	} satisfies ApiResponseUser);
+		success: true,
+		user: {
+			id: user.id,
+			createdAt: user.createdAt,
+			name: user.name,
+			email: user.email,
+			deactivated: user.deactivated,
+			devices: await database.device.findMany({ where: { ownerId: user.id }, select: { id: true } }),
+		},
+	} satisfies { success: true; user: ApiResponseUser });
 };

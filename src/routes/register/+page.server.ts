@@ -1,21 +1,30 @@
-import type { Actions } from '@sveltejs/kit';
+import type { RegisterAPIResponse } from '$lib/types';
+import { redirect, type Actions } from '@sveltejs/kit';
 
 export const actions = {
-	default: async ({ request, fetch }) => {
-		const data = await request.formData();
-		const res = await fetch('/api/auth/register', {
+	register: async ({ request, fetch }): Promise<RegisterAPIResponse> => {
+		const formData = await request.formData();
+
+		// get data from form
+		const name = formData.get('name');
+		const email = formData.get('email');
+		const password = formData.get('password');
+		const confirmPassword = formData.get('confirm-password');
+
+		// make api call
+		const response: RegisterAPIResponse = await fetch('/api/auth/register', {
 			method: 'post',
 			body: JSON.stringify({
-				name: data.get('name'),
-				email: data.get('email'),
-				password: data.get('password'),
-				confirmPassword: data.get('confirm-password'),
+				name,
+				email,
+				password,
+				confirmPassword,
 			}),
-		});
+		}).then(async (res) => await res.json());
 
-		const json = await res.json();
-		if (!json.success) return json;
+		// redirect when register is valid
+		if (response.success) return redirect(308, '/activate');
 
-		return { success: true };
+		return response;
 	},
 } satisfies Actions;

@@ -43,7 +43,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 	// check if passwords match
 	if (body.password !== body.confirmPassword)
-		return json({ success: false, message: 'Confirm password does not match' }, { status: 400 });
+		return json({ success: false, message: 'Passwords are not matching', key: 'confirmPassword' }, { status: 400 });
 
 	// generate user id
 	let userId = randomBytes(4).toString('hex');
@@ -65,13 +65,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	cookies.set('token', token, { httpOnly: true, maxAge: ms('3d') / 1000, path: '/' });
 
 	// create verification token
-	const verifyUrl = `${BASE_URL}/verify-account?token=${jwt.sign(
-		{ userId: userId, email: body.password },
-		ENCRYPTION_KEY,
-		{
-			expiresIn: '10m',
-		}
-	)}`;
+	const verifyUrl = `${BASE_URL}/activate?token=${jwt.sign({ userId: userId, email: body.password }, ENCRYPTION_KEY, {
+		expiresIn: '10m',
+	})}`;
 
 	// send email
 	await nodemailer

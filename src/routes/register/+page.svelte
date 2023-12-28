@@ -1,115 +1,85 @@
 <script lang="ts">
-	import { redirect } from '@sveltejs/kit';
+	import { enhance } from '$app/forms';
 	import type { ActionData } from './$types';
-	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
-
-	export let errors = {
-		name: {
-			error: false,
-			message: '',
-		},
-		email: {
-			error: false,
-			message: '',
-		},
-		password: {
-			error: false,
-			message: '',
-		},
-		confirmPassword: {
-			error: false,
-			message: '',
-		},
-	};
 
 	export let form: ActionData;
-	console.log(form); // remove later
-	if (form && form.success && browser) goto('/activate');
 </script>
 
 <div class="container">
-	<h1 class="title">Register</h1>
+	<h1 class="title">REGISTER</h1>
 
-	<form method="post" id="register-form">
+	{#if form && !form.success}
+		<div class="error">
+			<p>{form?.message}</p>
+		</div>
+	{/if}
+
+	<form class="register" method="post" action="?/register" use:enhance>
 		<input name="name" type="text" placeholder="Name" />
-		{#if errors.name.error}
-			<span class="form-error-message">
-				<i class="fa-solid fa-circle-exclamation"></i>
-				<p>{errors.name.message}</p>
-			</span>
-		{/if}
-
-		<input name="email" type="email" placeholder="Email" />
-		{#if errors.email.error}
-			<span class="form-error-message">
-				<i class="fa-solid fa-circle-exclamation"></i>
-				<p>{errors.email.message}</p>
-			</span>
-		{/if}
-
+		<input name="email" type="text" placeholder="Email" />
 		<input name="password" type="password" placeholder="Password" />
-		{#if errors.password.error}
-			<span class="form-error-message">
-				<i class="fa-solid fa-circle-exclamation"></i>
-				<p>{errors.name.message}</p>
-			</span>
-		{/if}
-
 		<input name="confirm-password" type="password" placeholder="Confirm Password" />
-		{#if errors.confirmPassword.error}
-			<span class="form-error-message">
-				<i class="fa-solid fa-circle-exclamation"></i>
-				<p>{errors.confirmPassword.message}</p>
-			</span>
-		{/if}
+		<button class="register-button" type="submit">Register</button>
 	</form>
 
-	<p>Already have an account? <a class="login-here-text" href="/login">Login Here</a></p>
-
-	<input class="submit-form-button" type="submit" form="register-form" value="Register" />
+	<p>Already have an account? <a class="login-here" href="/login">Login Here</a></p>
 </div>
 
 <style>
 	.container {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		height: 100vh;
 		justify-content: center;
-		height: 100vh; /* 100% of the viewport height */
-		margin: 0;
+		align-items: center;
 	}
 
 	.title {
-		text-transform: uppercase;
-		font-size: 26px;
+		font-size: 30px;
+		margin-bottom: 10px;
 	}
 
-	form {
-		display: flex;
-		flex-direction: column;
+	.error {
+		width: 250px;
+		margin: 8px 0;
+		border-width: 2px;
+		border-color: var(--red); /* Red-500 in Tailwind CSS */
+		padding: 0.75rem; /* Equivalent to p-3 in Tailwind CSS */
+		background-color: #fde4e4; /* Red-100 in Tailwind CSS */
+		border-radius: 2%;
+	}
+
+	.error p {
 		text-align: center;
 	}
 
-	.form-error-message {
+	.register {
 		display: flex;
-		margin: 3px 0 10px;
+		flex-direction: column;
+		align-items: center;
 	}
 
-	.form-error-message i {
-		color: var(--red);
-		margin-right: 5px;
-		font-size: 15px;
+	.register input {
+		width: 250px;
+		padding: 12px 20px;
+		margin: 8px 0;
+		display: inline-block;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		box-sizing: border-box;
 	}
 
-	.form-error-message p {
-		margin: 0;
-		font-size: 12px;
+	.register-button {
+		margin: 16px 0 24px;
+		background-color: var(--blue); /* Green */
+		border: none;
+		color: white;
+		padding: 15px 32px;
+		text-align: center;
+		font-size: 16px;
 	}
 
-	.login-here-text {
-	}
-
-	.submit-form-button {
+	.login-here {
+		color: var(--blue);
 	}
 </style>
