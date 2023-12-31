@@ -7,10 +7,10 @@ import cache from '$lib/server/cache';
 import ms from 'ms';
 import database from '$lib/server/database';
 
-export const POST: RequestHandler = async ({ url }) => {
+export const POST: RequestHandler = async ({ url, cookies }) => {
 	const token: InputParam | null = url.searchParams.get('token');
 
-	if (!token) return json({ success: false, message: 'No token provided' });
+	if (!token || token == 'null') return json({ success: false, message: 'No token provided' });
 	const schema = z.string();
 	type InputParam = z.infer<typeof schema>;
 	const results = schema.safeParse(token);
@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ url }) => {
 	// check if token has already been used
 	const tokenCacheKey = `used-tokens/token:${token}`;
 	if (await cache.has(tokenCacheKey)) {
-		return json({ succes: false, message: 'Token has already been used' }, { status: 401 });
+		return json({ succes: false, message: 'Invalid token provided' }, { status: 401 });
 	}
 
 	let decoded!: { iss: string; exp: number; userId: string };
@@ -40,16 +40,21 @@ export const POST: RequestHandler = async ({ url }) => {
 
 		// check for other errors
 		if (error instanceof jwt.JsonWebTokenError) {
-			const response = { success: false, message: 'Invalid token' };
+			const response = { success: false, message: 'Invalid token provided' };
 			return json(response, { status: 401 });
 		}
 	}
 
 	const cacheUser: CacheUser | undefined = await cache.get(`cache/user:${decoded.userId}`);
+
 	if (!cacheUser) throw new Error('Did not found a user in the cache');
 
 	await database.user.create({ data: cacheUser }); // create user
 	await cache.set(tokenCacheKey, {}, ms('10m')); // register token to prevent reusing
+
+	// set token
+	const authToken = jwt.sign({ userId: cacheUser.id }, ENCRYPTION_KEY, { expiresIn: '3d' });
+	cookies.set('token', authToken, { httpOnly: true, maxAge: ms('3d') / 1000, path: '/' });
 
 	return json({ success: true, message: 'User created' }, { status: 201 });
 };

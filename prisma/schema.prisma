@@ -5,6 +5,7 @@ datasource db {
 
 generator client {
     provider = "prisma-client-js"
+    output   = "../node_modules/.prisma/client"
 }
 
 model User {
@@ -13,6 +14,35 @@ model User {
     name      String   @db.VarChar(50)
     email     String   @unique @db.VarChar(254)
     password  String
+    devices   Device[]
 
     @@map("users")
+}
+
+model Device {
+    id               String    @id @unique @db.Char(8)
+    createdAt        DateTime  @default(now())
+    name             String?   @db.VarChar()
+    emoji            String    @default("🌊")
+    accessKey        String
+    owner            User?     @relation(fields: [ownerId], references: [id])
+    ownerId          String?   @db.Char(8)
+    updatedAt        DateTime? // last moment when measurements where captured
+    batteryLevel     Int?
+    lat              Float?
+    long             Float?
+    ph               Float?
+    tds              Int?
+    waterTemperature Float?
+    turbidity        Int?
+    risk             Risk      @default(UNKNOWN)
+
+    @@map("devices")
+}
+
+enum Risk {
+    HIGH
+    MODERATE
+    LOW
+    UNKNOWN // used when measurements are (partly) missing
 }

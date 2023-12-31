@@ -10,7 +10,7 @@ import cache from '$lib/server/cache';
 import ms from 'ms';
 import nodemailer from '$lib/server/nodemailer';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request }) => {
 	const schema = z.object({
 		name: z.string().min(1, 'No name provided').max(50, "A name can't be longer then 50 characters"),
 		email: z.string().email(),
@@ -52,20 +52,17 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	}
 
 	const cacheUser: CacheUser = {
-		...body,
 		id: userId,
+		name: body.name,
+		email: body.email,
 		password: await bcrypt.hash(body.password, await bcrypt.genSalt()),
 	};
 
 	const tempUserCacheKey = `cache/user:${userId}`;
 	await cache.set(tempUserCacheKey, cacheUser, ms('10m')); // put user in cache
 
-	// set token
-	const token = jwt.sign({ userId }, ENCRYPTION_KEY, { expiresIn: '3d' });
-	cookies.set('token', token, { httpOnly: true, maxAge: ms('3d') / 1000, path: '/' });
-
 	// create verification token
-	const verifyUrl = `${BASE_URL}/activate?token=${jwt.sign({ userId: userId, email: body.password }, ENCRYPTION_KEY, {
+	const verifyUrl = `${BASE_URL}/activate?token=${jwt.sign({ userId: userId, email: body.email }, ENCRYPTION_KEY, {
 		expiresIn: '10m',
 	})}`;
 

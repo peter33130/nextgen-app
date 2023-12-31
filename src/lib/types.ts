@@ -15,8 +15,6 @@ export interface ApiResponseUser {
 	createdAt: Date;
 	name: string;
 	email: string;
-	deactivated: boolean;
-	deactivationDate?: boolean;
 	devices: { id: string }[];
 }
 
@@ -24,4 +22,9 @@ export interface RegisterAPIResponse {
 	success: boolean;
 	message: string;
 	key?: 'name' | 'password' | 'email' | 'confirmPassword';
+}
+
+export interface NearestDeviceAPIResponse {
+	success: boolean;
+	devices: { name: string; emoji: string }[];
 }

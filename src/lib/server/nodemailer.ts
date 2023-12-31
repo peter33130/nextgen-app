@@ -3,7 +3,7 @@ import { MAIL_PASSWORD, MAIL_USER } from '$env/static/private';
 
 export default (() =>
 	createTransport({
-		name: 'www.example.com',
+		name: 'www.nextgen.com',
 		service: 'gmail',
 		host: 'smtp.gmail.com',
 		port: 587,

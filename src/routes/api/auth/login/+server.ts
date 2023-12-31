@@ -51,7 +51,6 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 			createdAt: user.createdAt,
 			name: user.name,
 			email: user.email,
-			deactivated: user.deactivated,
 			devices: await database.device.findMany({ where: { ownerId: user.id }, select: { id: true } }),
 		},
 	} satisfies { success: true; user: ApiResponseUser });

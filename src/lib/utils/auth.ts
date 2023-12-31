@@ -28,6 +28,6 @@ export async function checkCredentials(email: string, password: string): Promise
  * we need to make sure for later to validate auth on every protected route
  * and if not valid show messge AND also remove token from cookies
  * otherwise we will get in an endless loop in the login process
- * 
+ *
  * note that this is only (i think) when token is present in cookies but not valid
  */
