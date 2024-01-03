@@ -8,10 +8,10 @@
 		<li>
 			{#if url.endsWith('/devices')}
 				<i class="fa-solid fa-laptop" id="selected-item"></i>
-				<a href="/dashboard/devices" id="selected-item">My Devices</a>
+				<a href="/dashboard/devices" id="selected-item">Devices</a>
 			{:else}
 				<i class="fa-solid fa-laptop" id="unselected-item"></i>
-				<a href="/dashboard/devices" id="unselected-item">My Devices</a>
+				<a href="/dashboard/devices" id="unselected-item">Devices</a>
 			{/if}
 		</li>
 
@@ -43,10 +43,8 @@
 		padding: 0;
 		margin: 0;
 		width: 100%;
-		height: 80px;
+		height: 60px;
 		background-color: #f1f1f1;
-		border-color: #d3d3d3;
-		border: 1px;
 		position: fixed;
 		bottom: 0;
 		display: flex;
@@ -57,11 +55,10 @@
 	nav ul {
 		list-style: none;
 		padding: 0;
-		margin: 0;
 	}
 
 	ul li {
-		padding: 0 16px 0 16px;
+		padding: 0 32px 0 32px;
 		display: inline-block;
 		color: white;
 		text-align: center;

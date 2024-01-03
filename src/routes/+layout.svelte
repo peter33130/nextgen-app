@@ -5,4 +5,8 @@
 	import '../app.css';
 </script>
 
+<svelte:head>
+	<title>NextGen App</title>
+</svelte:head>
+
 <slot />
