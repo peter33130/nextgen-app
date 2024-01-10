@@ -32,9 +32,18 @@
 		height: 100vh;
 		justify-content: center;
 		align-items: center;
+		margin: 0;
+		padding: 0;
 	}
 
 	.title {
-		font-size: 40epx;
+		font-size: 30px;
+		margin: 10px;
+		padding: 0;
+	}
+
+	p {
+		margin: 0;
+		padding: 0;
 	}
 </style>

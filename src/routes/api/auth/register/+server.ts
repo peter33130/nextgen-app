@@ -5,10 +5,12 @@ import { randomBytes } from 'crypto';
 import type { CacheUser } from '$lib/types';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { BASE_URL, ENCRYPTION_KEY, MAIL_USER } from '$env/static/private';
+import { BASE_URL, ENCRYPTION_KEY } from '$env/static/private';
 import cache from '$lib/server/cache';
 import ms from 'ms';
-import nodemailer from '$lib/server/nodemailer';
+import { Resend } from 'resend';
+
+const resend = new Resend('re_jYisfoeF_3maPJRr6xLcmZnhGvHKLyZUv');
 
 export const POST: RequestHandler = async ({ request }) => {
 	const schema = z.object({
@@ -67,18 +69,15 @@ export const POST: RequestHandler = async ({ request }) => {
 	})}`;
 
 	// send email
-	await nodemailer
-		.sendMail({
-			from: `Nextgen 🌊 <${MAIL_USER}>`,
-			to: [body.email],
-			subject: 'Activeer je account',
+	resend.emails
+		.send({
+			from: 'onboarding@resend.dev',
+			to: body.email,
+			subject: 'Activate your account',
 			html: `Please verify your account by clicking on the link <a href="${verifyUrl}">here</a>.`,
 		})
-		.catch(async () => {
-			// we need to remove the temporary user from the cache
-			// otherwise the time that the temp-user and the activation-limit will not sync
-			await cache.delete(tempUserCacheKey);
-		});
+		.catch(async () => await cache.delete(tempUserCacheKey));
+
 	await cache.set(`sended-verify-email/email:${body.email}`, {}, ms('10m')); // keep track of the email we send
 
 	return json({ success: true, message: 'Check your inbox for an activation email' }, { status: 200 });

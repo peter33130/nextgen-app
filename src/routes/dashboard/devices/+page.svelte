@@ -20,10 +20,16 @@
 		</li></a
 	>
 {/each}
+
+<li class="add">
+	<i class="fa-solid fa-circle-plus"></i>
+</li>
+
 <NavBar />
 
 <style>
 	li {
+		background-color: #fff;
 		color: #000;
 		padding: 15px 15px 15px;
 		border-top: 1px solid #afafaf;
@@ -33,6 +39,12 @@
 		flex-direction: row;
 		align-items: center;
 		margin-bottom: -1px;
+	}
+
+	li i {
+		margin: auto;
+		font-size: 45px;
+		color: var(--green);
 	}
 
 	.emoji {
