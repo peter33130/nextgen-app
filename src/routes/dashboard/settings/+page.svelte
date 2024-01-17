@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import NavBar from '$lib/components/nav-bar.svelte';
 	import TopTitle from '$lib/components/top-title.svelte';
 	import type { PageData } from './$types';
 
 	export async function logout() {
-		if (browser) await fetch('/api/auth/logout', { method: 'post' });
+		if (browser) {
+			await fetch('/api/auth/logout', { method: 'post' });
+			await goto('/login');
+		}
 	}
 
 	export let data: PageData;

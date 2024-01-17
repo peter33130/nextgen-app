@@ -1,26 +1,18 @@
 import database from '$lib/server/database';
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const data = await database.device.findUnique({
+	const data = await fetch('http://localhost:3000/data').then(async (res) => await res.json());
+
+	const db = await database.device.findUnique({
 		where: { id: params.deviceId },
-		select: {
-			batteryLevel: true,
-			emoji: true,
-			name: true,
-			lat: true,
-			long: true,
-			ph: true,
-			tds: true,
-			turbidity: true,
-			waterTemperature: true,
-			risk: true,
-			updatedAt: true,
-		},
 	});
 
+	if (!db) redirect(308, '/dashboard/devices');
+
 	return {
-		title: `${data?.emoji} ${data?.name}`,
+		title: `${db.emoji} ${db.name}`,
 		advice: {
 			color: (() => {
 				switch (data!.risk) {
